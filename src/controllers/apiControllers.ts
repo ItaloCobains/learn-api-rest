@@ -108,3 +108,11 @@ export const getRandomPhrase = async (req: Request, res: Response) => {
         res.json({ error: 'nao ha frases cadastradas' })
     }
 }
+
+export const fileUpload = (req: Request, res: Response) => {
+    console.log("FILE", req.file);
+    console.log("FILES", req.files);
+
+
+    res.json({}) 
+}
