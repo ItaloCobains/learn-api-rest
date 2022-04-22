@@ -1,5 +1,6 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, ErrorRequestHandler } from 'express';
 import path from 'path';
+import { MulterError } from 'multer';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
@@ -21,4 +22,17 @@ server.use((req: Request, res: Response) => {
     res.json({ error: 'Endpoint não encontrado.' });
 });
 
-server.listen(process.env.PORT);
+const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+    res.status(400); //bad resquest
+
+    if (err instanceof MulterError) {
+        res.json({ error: err.code, msg: err.message });
+    } else {
+        console.log(err);
+        res.json({ error: "Ocorreu algum erro." });
+    };
+}
+
+server.use(errorHandler);
+
+server.listen(process.env.PORT); 

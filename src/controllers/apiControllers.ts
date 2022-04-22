@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { Sequelize } from 'sequelize';
 import { Phrase } from '../models/phrase';
+import sharp from 'sharp';
+import { unlink } from 'fs/promises';  
 
 export const ping = (req: Request, res: Response) => {
     res.json({
@@ -109,10 +111,19 @@ export const getRandomPhrase = async (req: Request, res: Response) => {
     }
 }
 
-export const fileUpload = (req: Request, res: Response) => {
-    console.log("FILE", req.file);
-    console.log("FILES", req.files);
+export const fileUpload = async (req: Request, res: Response) => {
+    if(req.file) {
+        const filename = req.file.filename + '.jpg';
 
+        await sharp(req.file.path)
+            .resize(500)
+            .toFormat('jpeg')
+            .toFile(`./public/media/${filename}.jpg`);
 
-    res.json({}) 
+        await unlink(req.file.path);
+
+        res.json({ image: `${filename}.jpg` })
+    }else {
+        res.json({error: "Arquivo não recebido."})
+    }
 }
